@@ -2,11 +2,12 @@ from graphviz import Digraph
 
 
 class LR0(object):
-    def __init__(self, productions) -> None:
+    def __init__(self, productions, terminals=None) -> None:
         self.productions = productions
         self.start_symbol = productions[0][0]
         self.nonterminals = {prod[0] for prod in productions}
         self.relations = []
+        self.terminals = terminals
 
     def augment(self) -> None:
         new_start_symbol = f"{self.start_symbol}'"
@@ -112,6 +113,9 @@ class LR0(object):
 
         # Avoid duplicates in relations
         relations = list(set(relations))
+
+        self.relations = relations
+        self.C = C
 
         return C, relations
 
@@ -237,3 +241,11 @@ class LR0(object):
                     else:
                         # Symbol is a terminal, reset trail for next symbol
                         trail = {symbol}
+
+    def get_production_index(self, head, body):
+        """Return the index of a production rule."""
+        body_tuple = tuple(body)  # Ensure the body is hashable
+        for index, (prod_head, prod_body) in enumerate(self.productions):
+            if prod_head == head and tuple(prod_body) == body_tuple:
+                return index
+        return None

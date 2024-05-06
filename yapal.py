@@ -1,8 +1,9 @@
 import argparse
 import src.YAPAL_TOKENIZER as tokenizer
 from src._yapal_seq import YapalSequencer as yapal_seq
-from LR0 import LR0 as Grammar
+from src.LR0 import LR0 as Grammar
 from yalex import yalex
+from src.SLR1 import SLR1
 
 
 def main():
@@ -72,7 +73,7 @@ def main():
         print("✖ No productions defined in YAPAL")
         return
 
-    grammar = Grammar(ypsq.get_defined_productions())
+    grammar = Grammar(ypsq.get_defined_productions(), ypsq.get_terminals())
 
     print("✔ Grammar has been created successfully")
 
@@ -81,7 +82,10 @@ def main():
     print("✔ Productions have been augmented successfully:")
     print(grammar)
 
-    C, relations = grammar.items(ypsq.get_symbols())
+    symbols = ['expression', 'term', 'factor', 'LPAREN',
+               'ID', 'PLUS', 'TIMES',  'RPAREN']
+
+    C, relations = grammar.items(symbols)
 
     print("✔ Items has been generated successfully:")
     for i, items in enumerate(C):
@@ -108,6 +112,11 @@ def main():
     for key, value in grammar.follow_sets.items():
         print(f"\t[{idx}] {key}: {value}")
         idx += 1
+
+    slr1 = SLR1(grammar)
+    print("✔ SLR1 table has been generated successfully:")
+    print(slr1.table(['ID', 'PLUS', 'TIMES', 'LPAREN',
+          'RPAREN'], ['expression', 'term', 'factor']))
 
 
 if __name__ == "__main__":
