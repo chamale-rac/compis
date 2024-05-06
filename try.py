@@ -1,4 +1,4 @@
-from src.grammar import Grammar
+from LR0 import LR0 as Grammar
 from src._yapal_seq import YapalSequencer as yapal_seq
 import src.YAPAL_TOKENIZER as tokenizer
 

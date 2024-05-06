@@ -1,7 +1,7 @@
 from graphviz import Digraph
 
 
-class Grammar(object):
+class LR0(object):
     def __init__(self, productions) -> None:
         self.productions = productions
         self.start_symbol = productions[0][0]
