@@ -208,4 +208,27 @@ class Grammar(object):
                     changed = True
 
     def compute_follow(self):
-        pass
+        # Initialize FOLLOW sets
+        self.follow_sets = {symbol: set() for symbol in self.nonterminals}
+        # Start symbol gets end-of-input marker
+        self.follow_sets[self.start_symbol].add('$')
+        changed = True
+
+        while changed:
+            changed = False
+            for head, production in self.productions:
+                follow_temp = self.follow_sets[head]
+                # Reverse production to propagate FOLLOW properly
+                for symbol in reversed(production):
+                    if symbol in self.nonterminals:
+                        before_add = len(self.follow_sets[symbol])
+                        self.follow_sets[symbol].update(follow_temp)
+                        if len(self.follow_sets[symbol]) != before_add:
+                            changed = True
+                    # Update follow_temp to include FIRST(symbol) if non-terminal
+                    if symbol in self.nonterminals and 'ε' in self.first_sets[symbol]:
+                        follow_temp.update(
+                            x for x in self.first_sets[symbol] if x != 'ε')
+                    else:
+                        follow_temp = self.first_sets[symbol] if symbol in self.nonterminals else {
+                            symbol}

@@ -101,6 +101,14 @@ def main():
         print(f"\t[{idx}] {key}: {value}")
         idx += 1
 
+    grammar.compute_follow()
+    print("✔ Follow sets have been computed successfully:")
+    # Iterate over keys and values in dictionary
+    idx = 0
+    for key, value in grammar.follow_sets.items():
+        print(f"\t[{idx}] {key}: {value}")
+        idx += 1
+
 
 if __name__ == "__main__":
     main()
