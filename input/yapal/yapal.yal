@@ -1,0 +1,23 @@
+let cm = '/''*'((' '|[^'/'])*)'*''/'
+let minus = ['a'-'z']+
+let mayus = ['A'-'Z']+
+let svd = '%''t''o''k''e''n'
+let stat = ':'
+let end = ';'
+let rpt = '|'
+let spt = '%''%'
+let sp = [' ''\t']+
+let nl = ['\n']+
+
+
+rule tokens = 
+  minus        { WS }
+  | mayus      { WS }
+  | svd        { WS }
+  | stat       { WS }
+  | end        { WS }
+  | rpt        { WS }
+  | spt        { WS }
+  | sp         { WS }
+  | nl         { WS }
+  | cm         { WS }

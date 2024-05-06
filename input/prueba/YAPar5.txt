@@ -1,0 +1,27 @@
+
+%token A B C D G H F
+%token EPSILON
+IGNORE EPSILON
+%%
+
+s:
+    | A b d H
+;
+b:
+    | C c
+;
+c:
+    | B c
+    | EPSILON
+;
+d:
+    | e f
+;
+e:
+    | G
+    | EPSILON
+;
+f:
+    | F
+    | EPSILON
+;
