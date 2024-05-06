@@ -190,9 +190,9 @@ class Grammar(object):
                     symbol = production[i]
                     if symbol in self.nonterminals:
                         # Add non-ε symbols from FIRST(symbol) to FIRST(head)
-                        non_epsilon = self.first_sets[symbol] - {'ε'}
+                        non_epsilon = self.first_sets[symbol] - {'EPSILON'}
                         self.first_sets[head].update(non_epsilon)
-                        if 'ε' not in self.first_sets[symbol]:
+                        if 'EPSILON' not in self.first_sets[symbol]:
                             break
                     else:
                         # First terminal encountered determines the FIRST set
@@ -201,7 +201,7 @@ class Grammar(object):
                     i += 1
                 else:
                     # If all symbols can derive ε, add ε to FIRST(head)
-                    self.first_sets[head].add('ε')
+                    self.first_sets[head].add('EPSILON')
 
                 # Check if set changed in size
                 if first_len_before != len(self.first_sets[head]):
@@ -212,23 +212,28 @@ class Grammar(object):
         self.follow_sets = {symbol: set() for symbol in self.nonterminals}
         # Start symbol gets end-of-input marker
         self.follow_sets[self.start_symbol].add('$')
-        changed = True
 
+        changed = True
         while changed:
             changed = False
             for head, production in self.productions:
-                follow_temp = self.follow_sets[head]
-                # Reverse production to propagate FOLLOW properly
+                trail = set(self.follow_sets[head])
+                # We iterate from the end of the production to the start
                 for symbol in reversed(production):
                     if symbol in self.nonterminals:
+                        # Current symbol is a nonterminal, update its FOLLOW set
                         before_add = len(self.follow_sets[symbol])
-                        self.follow_sets[symbol].update(follow_temp)
+                        self.follow_sets[symbol].update(trail)
                         if len(self.follow_sets[symbol]) != before_add:
                             changed = True
-                    # Update follow_temp to include FIRST(symbol) if non-terminal
-                    if symbol in self.nonterminals and 'ε' in self.first_sets[symbol]:
-                        follow_temp.update(
-                            x for x in self.first_sets[symbol] if x != 'ε')
+
+                        # If ε is in FIRST(symbol), we keep trail, else we reset it with FIRST(symbol) minus ε
+                        if 'EPSILON' in self.first_sets[symbol]:
+                            trail.update(
+                                x for x in self.first_sets[symbol] if x != 'EPSILON')
+                        else:
+                            trail = set(
+                                x for x in self.first_sets[symbol] if x != 'EPSILON')
                     else:
-                        follow_temp = self.first_sets[symbol] if symbol in self.nonterminals else {
-                            symbol}
+                        # Symbol is a terminal, reset trail for next symbol
+                        trail = {symbol}

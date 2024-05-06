@@ -28,6 +28,9 @@ def main():
         print(f"\t[{idx}] {key}: {value}")
         idx += 1
 
+    # Print non-terminals
+    print(f"Non terminals: {ypsq.get_non_terminals()}")
+
 
 if __name__ == "__main__":
     main()
