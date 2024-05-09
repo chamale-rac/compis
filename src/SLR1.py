@@ -26,16 +26,6 @@ class SLR1(object):
                     else:
                         self.action[state_idx][symbol] = ('shift', goto_state)
 
-            # Handle reduce and accept entries
-            # for item in items:
-            #     head, body, dot_position, is_kernel = item
-            #     if dot_position == len(body):  # Check if the dot is at the end
-            #         if head == self.lr0.start_symbol:
-            #             self.action[state_idx]['$'] = ('accept',)
-            #         else:
-            #             for follow_symbol in self.lr0.follow_sets[head]:
-            #                 self.action[state_idx][follow_symbol] = (
-            #                     'reduce', head, body)
             for item in items:
                 head, body, dot_position, is_kernel = item
                 if dot_position == len(body):  # Check if the dot is at the end
@@ -46,6 +36,55 @@ class SLR1(object):
                         for follow_symbol in self.lr0.follow_sets[head]:
                             self.action[state_idx][follow_symbol] = (
                                 'reduce', prod_index)
+
+    def LRparsing(self, input_list: list):
+        stack = [0]  # start with initial state
+        index = 0
+        symbols = []
+        input_symbols = input_list + ['$']  # append end marker
+        log = []
+
+        while True:
+            current_state = stack[-1]
+            current_symbol = input_symbols[index]
+            action_entry = self.action.get(
+                current_state, {}).get(current_symbol, None)
+
+            # Log current step
+            log.append({
+                "Stack": stack[:],
+                "Symbols": symbols[:],
+                "Input": input_symbols[index:],
+                "Action": action_entry if action_entry else "error"
+            })
+
+            if action_entry is None:
+                # Handle error: Undefined action
+                return log, "Error: No action defined for this state and symbol combination."
+
+            action, *params = action_entry
+
+            if action == 'shift':
+                # Shift the next state onto the stack and move to the next symbol
+                stack.append(params[0])
+                symbols.append(current_symbol)
+                index += 1
+
+            elif action == 'reduce':
+                # Reduce action: pop |β| symbols off the stack, find next state using GOTO, push onto stack
+                production_index = params[0]
+                head, body = self.lr0.productions[production_index]
+                for _ in range(len(body)):
+                    stack.pop()
+                    symbols.pop()
+                stack.append(self.goto[stack[-1]][head])
+                symbols.append(head)
+
+            elif action == 'accept':
+                # Parsing successfully completed
+                return log, "Accepted"
+
+        # The while loop will always terminate with either a return on accept or error.
 
     def find_state(self, items):
         """

@@ -5,6 +5,8 @@ from src.LR0 import LR0 as Grammar
 from yalex import yalex
 from src.SLR1 import SLR1
 
+# py .\yapal.py .\input\tests\slr-1\slr-1.yal .\input\tests\slr-1\slr-1.yalp .\input\tests\slr-1\slr-1-1.txt
+
 
 def main():
     parser = argparse.ArgumentParser(description='Process some files.')
@@ -117,6 +119,15 @@ def main():
     print("✔ SLR1 table has been generated successfully:")
     print(slr1.table(['ID', 'PLUS', 'TIMES', 'LPAREN',
           'RPAREN'], ['expression', 'term', 'factor']))
+
+    input_list = ['ID', 'PLUS', 'ID', 'TIMES',
+                  'ID', 'PLUS', 'ID', 'TIMES', 'ID']
+    log, result = slr1.LRparsing(input_list)
+
+    print("✔ SLR1 parsing has been executed successfully:")
+    for step in log:
+        print(step)
+    print(result)
 
 
 if __name__ == "__main__":
