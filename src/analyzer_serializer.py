@@ -1,5 +1,6 @@
 def generate_script(analyzer_path, output_file):
     code_template = """
+import csv
 import argparse
 from colorama import Fore, Style
 
@@ -76,21 +77,29 @@ def analyze(read_file_path, verb=True):
     return symbolTable
 
 def main():
-    symbolTable = []
+    # Set up the argument parser
     parser = argparse.ArgumentParser(description="Lexer Analyzer")
-    parser.add_argument('read_file_path', type=str,
-                        help='The .txt to tokenize')  # Read from file
-    parser.add_argument('verbose', type=str2bool,
-                        help='A boolean flag to show the logs or not.')  # Show logs
+    parser.add_argument('read_file_path', type=str, help='The .txt file to tokenize')
+    parser.add_argument('output_file_path', type=str, help='The output .txt file to write the tokens as CSV')
+    parser.add_argument('verbose', type=str2bool, help='A boolean flag to show the logs or not.')
 
+    # Parse the command line arguments
     args = parser.parse_args()
 
+    # Set the global verbose flag
     global verbose
     verbose = args.verbose
     
+    # Read the file path and process the symbols
     read_file_path = args.read_file_path
-    print(analyze(read_file_path, verbose))
+    symbols = analyze(read_file_path, verbose)
 
+    # Write the symbols to the specified output file a symbol[0] per line
+    with open(args.output_file_path, 'w', newline='') as file:
+        for symbol in symbols:
+            file.write(symbol[0] + '\\n')
+
+    print(f'Tokens have been written to {{args.output_file_path}}')
 
 if __name__ == "__main__":
     main()

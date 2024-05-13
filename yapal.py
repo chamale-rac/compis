@@ -4,7 +4,7 @@ from src._yapal_seq import YapalSequencer as yapal_seq
 from src.LR0 import LR0 as Grammar
 from yalex import yalex
 from src.SLR1 import SLR1
-
+from src.utils.tools import save_to_pickle
 # py .\yapal.py .\input\tests\slr-1\slr-1.yal .\input\tests\slr-1\slr-1.yalp .\input\tests\slr-1\slr-1-1.txt
 
 
@@ -84,10 +84,10 @@ def main():
     print("✔ Productions have been augmented successfully:")
     print(grammar)
 
-    symbols = ['expression', 'term', 'factor', 'LPAREN',
-               'ID', 'PLUS', 'TIMES',  'RPAREN']
+    # symbols = ['expression', 'term', 'factor', 'LPAREN',
+    #            'ID', 'PLUS', 'TIMES',  'RPAREN']
 
-    C, relations = grammar.items(symbols)
+    C, relations = grammar.items(ypsq.get_symbols())
 
     print("✔ Items has been generated successfully:")
     for i, items in enumerate(C):
@@ -117,17 +117,22 @@ def main():
 
     slr1 = SLR1(grammar)
     print("✔ SLR1 table has been generated successfully:")
-    print(slr1.table(['ID', 'PLUS', 'TIMES', 'LPAREN',
-          'RPAREN'], ['expression', 'term', 'factor']))
+    print(slr1.table(ypsq.get_terminals(), ypsq.get_non_terminals()))
 
-    input_list = ['ID', 'PLUS', 'ID', 'TIMES',
-                  'ID', 'PLUS', 'ID', 'TIMES', 'ID']
-    log, result = slr1.LRparsing(input_list)
+    # # input_list = ['ID', 'PLUS', 'ID', 'TIMES',
+    # #               'ID', 'PLUS', 'ID', 'TIMES', 'ID']
+    # input_list = ['ID', 'POWER', 'ID', 'POWER', 'ID']
 
-    print("✔ SLR1 parsing has been executed successfully:")
-    for step in log:
-        print(step)
-    print(result)
+    # log, result = slr1.LRparsing(input_list)
+
+    # print("✔ SLR1 parsing has been executed successfully:")
+    # for step in log:
+    #     print(step)
+    # print(result)
+    save_as = save_to_pickle(slr1,
+                             directory='.',
+                             filename='SLR1_TABLE',
+                             structure_name='SLR1 Table')
 
 
 if __name__ == "__main__":

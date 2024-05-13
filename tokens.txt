@@ -1,0 +1,7 @@
+ws
+PLUS
+ws
+ws
+ws
+TIMES
+ws
