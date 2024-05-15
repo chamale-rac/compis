@@ -116,19 +116,27 @@ def main():
         idx += 1
 
     slr1 = SLR1(grammar)
+
+    print("Constructing SLR1 table...")
+    has_conflicts = slr1.construct_tables()
+    if has_conflicts:
+        print("✖ SLR1 table could not be generated correctly")
+        print(slr1.table(ypsq.get_terminals(), ypsq.get_non_terminals()))
+        return
+
     print("✔ SLR1 table has been generated successfully:")
     print(slr1.table(ypsq.get_terminals(), ypsq.get_non_terminals()))
 
-    # # input_list = ['ID', 'PLUS', 'ID', 'TIMES',
-    # #               'ID', 'PLUS', 'ID', 'TIMES', 'ID']
-    # input_list = ['ID', 'POWER', 'ID', 'POWER', 'ID']
+    # input_list = ['ID', 'PLUS', 'ID', 'TIMES',
+    #               'ID', 'PLUS', 'ID', 'TIMES', 'ID']
+    input_list = ['ID', 'POWER', 'ID', 'POWER', 'ID']
 
-    # log, result = slr1.LRparsing(input_list)
+    log, result = slr1.LRparsing(input_list)
 
-    # print("✔ SLR1 parsing has been executed successfully:")
-    # for step in log:
-    #     print(step)
-    # print(result)
+    print("✔ SLR1 parsing has been executed successfully:")
+    for step in log:
+        print(step)
+    print(result)
     save_as = save_to_pickle(slr1,
                              directory='.',
                              filename='SLR1_TABLE',

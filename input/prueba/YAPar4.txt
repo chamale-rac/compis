@@ -1,5 +1,5 @@
 
-%token A B C D G H
+%token A B C D G H TO
 %token EPSILON
 IGNORE EPSILON
 %%
@@ -20,4 +20,4 @@ b:
 c:
     | H
     | EPSILON
-;
+;  

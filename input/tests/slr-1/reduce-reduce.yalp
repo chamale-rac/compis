@@ -9,7 +9,7 @@ IGNORE WS
 %%
 
 expression:
-    expression PLUS term
+    expression PLUS expression
   | term
 ;
 
@@ -19,7 +19,7 @@ term:
 ;
 
 factor:
-    factor POWER factor
+    factor POWER base
   | base
 ;
 

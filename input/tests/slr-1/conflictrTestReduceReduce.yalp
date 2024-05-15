@@ -1,0 +1,14 @@
+%token INT PLUS TIMES
+
+%%
+
+e:
+    e PLUS e
+  | e TIMES e
+  | f
+;
+
+f:
+    INT
+  | e PLUS INT  // Overlaps with 'e PLUS e' when reduced by 'e -> f'
+;

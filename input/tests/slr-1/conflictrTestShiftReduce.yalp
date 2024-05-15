@@ -1,0 +1,7 @@
+%token INT PLUS TIMES
+
+%%
+
+e:
+    e PLUS e | e TIMES e | INT
+;

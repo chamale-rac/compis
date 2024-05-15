@@ -8,24 +8,36 @@ class SLR1(object):
         self.action = {}
         self.goto = {}
 
-        self.construct_tables()
-
     def construct_tables(self):
+        has_conflicts = False
+
         # Initialize ACTION and GOTO tables
         for state_idx, items in enumerate(self.lr0.C):
             self.action[state_idx] = {}
             self.goto[state_idx] = {}
 
             # Handle shift and goto entries
+            # if 'EPSILON' in self.lr0.terminals:
+            #     self.lr0.terminals.remove('EPSILON')
+
             for symbol in self.lr0.nonterminals.union(self.lr0.terminals):
+                # if symbol == 'EPSILON':  # Skip EPSILON for shift and goto
+                #     continue
                 goto_result = self.lr0.goto(items, symbol)
                 if goto_result:
                     goto_state = self.find_state(goto_result)
                     if symbol in self.lr0.nonterminals:
                         self.goto[state_idx][symbol] = goto_state
                     else:
+                        if symbol in self.action[state_idx]:
+                            existing_action = self.action[state_idx][symbol]
+                            if existing_action[0] == 'reduce':
+                                print(
+                                    f"\t✖ Shift-Reduce conflict at state {state_idx} on symbol '{symbol}'")
+                                has_conflicts = True
                         self.action[state_idx][symbol] = ('shift', goto_state)
 
+            # Handle reduce entries
             for item in items:
                 head, body, dot_position, is_kernel = item
                 if dot_position == len(body):  # Check if the dot is at the end
@@ -34,8 +46,24 @@ class SLR1(object):
                     else:
                         prod_index = self.lr0.get_production_index(head, body)
                         for follow_symbol in self.lr0.follow_sets[head]:
+                            # if follow_symbol == 'EPSILON':  # Skip EPSILON in follows
+                            #     continue
+                            if follow_symbol in self.action[state_idx]:
+                                existing_action = self.action[state_idx][follow_symbol]
+                                if existing_action[0] == 'shift':
+                                    print(
+                                        f"\t✖ Shift-Reduce conflict at state {state_idx} on symbol '{follow_symbol}'")
+                                    has_conflicts = True
+                                elif existing_action[0] == 'reduce':
+                                    if existing_action[1] != prod_index:
+                                        print(
+                                            f"\t✖ Reduce-Reduce conflict at state {state_idx} on symbol '{follow_symbol}'", existing_action, ('reduce',
+                                                                                                                                              prod_index))
+                                        has_conflicts = True
                             self.action[state_idx][follow_symbol] = (
                                 'reduce', prod_index)
+
+        return has_conflicts
 
     def LRparsing(self, input_list: list):
         stack = [0]  # start with initial state
@@ -106,6 +134,9 @@ class SLR1(object):
             nonterminals = list(self.lr0.nonterminals)
             # From non_terminals remove the start symbol
             nonterminals.remove(self.lr0.start_symbol)
+
+        # if "EPSILON" in terminals:
+        #     terminals.remove("EPSILON")
 
         terminals.append('$')
 
