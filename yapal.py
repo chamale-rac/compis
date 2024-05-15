@@ -1,4 +1,5 @@
 import argparse
+import enum
 import src.YAPAL_TOKENIZER as tokenizer
 from src._yapal_seq import YapalSequencer as yapal_seq
 from src.LR0 import LR0 as Grammar
@@ -14,8 +15,8 @@ def main():
                         help='File with the lexical analyzer specification (.yal)')
     parser.add_argument('yapl_file', type=str,
                         help='File with the syntax analyzer specification (.yapl)')
-    parser.add_argument('input_file', type=str,
-                        help='File with input strings for both generators')
+    # parser.add_argument('input_file', type=str,
+    #                     help='File with input strings for both generators')
 
     args = parser.parse_args()
 
@@ -23,7 +24,7 @@ def main():
 
     print(f"Lexical file: {args.yal_file}")
     print(f"Syntax file: {args.yapl_file}")
-    print(f"Input file: {args.input_file}")
+    # print(f"Input file: {args.input_file}")
 
     print('-'*80)
     print("YALEX")
@@ -116,6 +117,7 @@ def main():
         idx += 1
 
     slr1 = SLR1(grammar)
+    slr1.ignored_tokens = ypsq.get_ignored_tokens()
 
     print("Constructing SLR1 table...")
     has_conflicts = slr1.construct_tables()
@@ -125,22 +127,24 @@ def main():
         return
 
     print("✔ SLR1 table has been generated successfully:")
+    # print(slr1.table(['ID', 'PLUS', 'TIMES', 'LPAREN',
+    #       'RPAREN'], ['expression', 'term', 'factor']))
     print(slr1.table(ypsq.get_terminals(), ypsq.get_non_terminals()))
 
-    # input_list = ['ID', 'PLUS', 'ID', 'TIMES',
-    #               'ID', 'PLUS', 'ID', 'TIMES', 'ID']
-    input_list = ['ID', 'POWER', 'ID', 'POWER', 'ID']
+    input_list = ['ID', 'WS', 'TIMES', 'WS', 'ID']
 
-    log, result = slr1.LRparsing(input_list)
+    # log, result = slr1.LRparsing(input_list)
 
-    print("✔ SLR1 parsing has been executed successfully:")
-    for step in log:
-        print(step)
-    print(result)
+    # print("✔ SLR1 parsing has been executed successfully:")
+    # print_table(log)
+    # print(result)
+
     save_as = save_to_pickle(slr1,
                              directory='.',
-                             filename='SLR1_TABLE',
+                             file_name='SLR1_TABLE',
                              structure_name='SLR1 Table')
+
+    print(f"✔ Analyzer saved successfully as {save_as}")
 
 
 if __name__ == "__main__":

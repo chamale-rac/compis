@@ -7,6 +7,7 @@ class SLR1(object):
         self.lr0: LR0 = lr0
         self.action = {}
         self.goto = {}
+        self.ignored_tokens = set()
 
     def construct_tables(self):
         has_conflicts = False
@@ -71,6 +72,10 @@ class SLR1(object):
         symbols = []
         input_symbols = input_list + ['$']  # append end marker
         log = []
+
+        # Remove any ignored tokens from the input list
+        input_symbols = [
+            symbol for symbol in input_symbols if symbol not in self.ignored_tokens]
 
         while True:
             current_state = stack[-1]

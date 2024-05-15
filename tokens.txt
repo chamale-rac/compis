@@ -1,11 +1,5 @@
 id
 ws
-PLUS
-ws
-id
-ws
-id
-ws
 TIMES
 ws
 id
