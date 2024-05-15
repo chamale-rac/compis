@@ -1,3 +1,5 @@
+def generate_script(table_path, output_file):
+    code_template = """
 import argparse
 
 from src.utils.tools import load_from_pickle
@@ -39,9 +41,9 @@ def print_table(array):
 
 
 def simulate(tokensSequence):
-    structure = load_from_pickle('SLR1_TABLE.pkl')
-    vrint('✔ Analyzer loaded successfully from SLR1_TABLE.pkl')
-
+    structure = load_from_pickle('{table_path}')
+    vrint('✔ Analyzer loaded successfully.')
+    print('Ignoring:', structure.ignored_tokens)
     log, result = structure.LRparsing(tokensSequence)
     vrint('✔ SLR1 parsing has been executed successfully:')
     print_table(log)
@@ -75,3 +77,8 @@ def main():
 if __name__ == "__main__":
     main()
     vrint('Exiting...')
+"""
+    with open(output_file, 'w', encoding='utf-8') as file:
+        file.write(code_template.format(table_path=table_path))
+
+    return output_file

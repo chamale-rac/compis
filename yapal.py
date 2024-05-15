@@ -6,6 +6,7 @@ from src.LR0 import LR0 as Grammar
 from yalex import yalex
 from src.SLR1 import SLR1
 from src.utils.tools import save_to_pickle
+from src.yapal_serializer import generate_script
 # py .\yapal.py .\input\tests\slr-1\slr-1.yal .\input\tests\slr-1\slr-1.yalp .\input\tests\slr-1\slr-1-1.txt
 
 
@@ -143,6 +144,8 @@ def main():
                              directory='.',
                              file_name='SLR1_TABLE',
                              structure_name='SLR1 Table')
+
+    save_as = generate_script(save_as, 'SLR1_TABLE.py')
 
     print(f"✔ Analyzer saved successfully as {save_as}")
 
